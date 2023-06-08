@@ -1,36 +1,28 @@
-def tick(args)
-  args.outputs.labels << { x: 640, y: 540, text: "Hello World!", size_enum: 5, alignment_enum: 1 }
+class Flappybird
 
-  args.outputs.labels << {
-    x: 640,
-    y: 500,
-    text: "Docs located at ./docs/docs.html and 100+ samples located under ./samples",
-    size_enum: 5,
-    alignment_enum: 1
-  }
+  def initialize(args)
+    @args =args
+    @player = {
+      x: 300,
+      y: 300,
+      w: 90,
+      h: 75,
 
-  args.outputs.labels << {
-    x: 640,
-    y: 460,
-    text: "Join the Discord server! https://discord.dragonruby.org",
-    size_enum: 5,
-    alignment_enum: 1
-  }
+      path: "sprites/hexagon/orange.png",
+    }
 
-  args.outputs.sprites << {
-    x: 576,
-    y: 280,
-    w: 128,
-    h: 101,
-    path: "dragonruby.png",
-    angle: args.state.tick_count
-  }
+  end
+  def tick
+    render
+  end
 
-  args.outputs.labels << {
-    x: 640,
-    y: 60,
-    text: "./mygame/app/main.rb",
-    size_enum: 5,
-    alignment_enum: 1
-  }
+  def render
+    @args.outputs.solids << {x: 0, y: 0, w: @args.grid.w, h: @args.grid.h, r: 135, g: 206,b:235}
+    @args.outputs.sprites << [@player]
+  end
 end
+def tick(args)
+  args.state.game ||= Flappybird.new(args)
+  args.state.game.tick
+end
+$gtk.reset
