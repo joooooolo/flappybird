@@ -6,11 +6,10 @@ class Flappybird
 
   def initialize(args)
     @args = args
-    @obstacles = [
-      { x: 1280, y: 450, w: 150, h: 650, r: 0, g: 128, b: 0 },
-      { x: 1280, y: 0, w: 150, h: 250, r: 0, g: 128, b: 0 },
-    ]
     @timer = TIMER*FPS
+
+    @obstacles = []
+    spawn_obstacles
 
     @player = {
       x: 300,
@@ -25,7 +24,7 @@ class Flappybird
 
   def tick
     render
-    spawn_obstacles
+    handle_timer
     moving_obstacles
     fall
     jump_player
@@ -48,12 +47,14 @@ class Flappybird
     @args.outputs.labels << { x: 50, y: 50, text: @player[:velocity].to_i }
   end
 
-  def spawn_obstacles
+  def handle_timer
     @timer += 1
-    if @timer % 200 == 0
-      @obstacles << { x: 1280, y: 450, w: 150, h: 650, r: 0, g: 128, b: 0 }
-      @obstacles << { x: 1280, y: 0, w: 150, h: 250, r: 0, g: 128, b: 0 }
-    end
+    spawn_obstacles if @timer % 200 == 0
+  end
+
+  def spawn_obstacles
+    @obstacles << { x: 1280, y: 450, w: 150, h: 650, r: 0, g: 128, b: 0 }
+    @obstacles << { x: 1280, y: 0, w: 150, h: 250, r: 0, g: 128, b: 0 }
   end
 
   def moving_obstacles
