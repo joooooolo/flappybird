@@ -38,8 +38,7 @@ class Flappybird
 
   def jump_player
     if @args.inputs.keyboard.key_down.space
-      @velocity = +6
-      @player[:y] -= @velocity
+      @velocity = 6
     end
   end
 
