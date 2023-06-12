@@ -13,7 +13,6 @@ class Flappybird
       {x: 1280, y: 0, w: 150, h: 250, r: 0, g: 128, b: 0},
     ]
     @timer = TIMER*FPS
-@velocity = 0
 
     @player = {
       x: 300,
@@ -22,39 +21,37 @@ class Flappybird
       h: PLAYER_SIZE,
       path: "sprites/hexagon/orange.png",
 
-
     }
-
-  end
+@velocity = 0
+ end
 
   def tick
     render
     spawn_obstacles
     moving_obstacles
     fall
-    jump
-    jumping
+    jump_player
   end
 
   def fall
-    @velocity += 1
-    @player[:velocity]
+
+    @velocity -= 0.2
+    @player[:y] += @velocity
+
   end
 
-  def jump
-
-    @player[:y] -= 5
-    @velocity = 0
-  end
-
-  def jumping
+  def jump_player
     if @args.inputs.keyboard.key_down.space
-      @player.jump
+
+      @velocity = +6
+        @player[:y] -= @velocity
     end
   end
+
   def render
     @args.outputs.solids << {x: 0, y: 0, w: @args.grid.w, h: @args.grid.h, r: 135, g: 206,b:235}
     @args.outputs.sprites << [@player, @obstacles]
+    @args.outputs.labels << {x: 50, y: 50, text: @velocity.to_i}
   end
 
   def spawn_obstacles
