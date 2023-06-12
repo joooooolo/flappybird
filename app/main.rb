@@ -6,7 +6,7 @@ class FlappyBird
 
   def initialize(args)
     @args = args
-    @timer = TIMER*FPS
+    @timer = TIMER * FPS
 
     @obstacles = []
     spawn_obstacles
