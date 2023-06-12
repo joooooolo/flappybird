@@ -1,4 +1,4 @@
-class Flappybird
+class FlappyBird
   TIMER = 10
   FPS = 60
   SPEED = 2
@@ -65,7 +65,7 @@ class Flappybird
 end
 
 def tick(args)
-  args.state.game ||= Flappybird.new(args)
+  args.state.game ||= FlappyBird.new(args)
   args.state.game.tick
 end
 
