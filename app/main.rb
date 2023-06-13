@@ -3,7 +3,6 @@ class FlappyBird
   FPS = 60
   SPEED = 2
   PLAYER_SIZE = 40
-
   def initialize(args)
     @args = args
     @timer = TIMER * FPS
@@ -20,6 +19,7 @@ class FlappyBird
 
       velocity: 0
     }
+
   end
 
   def tick
@@ -28,6 +28,7 @@ class FlappyBird
     moving_obstacles
     fall
     jump_player
+    handle_collisions
   end
 
   def fall
@@ -41,6 +42,19 @@ class FlappyBird
     end
   end
 
+  def handle_collisions
+
+    if @player[:y] < @args.grid.y
+      $gtk.reset
+    end
+
+    @obstacles.each do |obstacle|
+    if @player.intersect_rect?(obstacle)
+      $gtk.reset
+    end
+    end
+end
+
   def render
     @args.outputs.solids << { x: 0, y: 0, w: @args.grid.w, h: @args.grid.h, r: 135, g: 206, b: 235 }
     @args.outputs.sprites << [@player, @obstacles]
@@ -53,8 +67,9 @@ class FlappyBird
   end
 
   def spawn_obstacles
-    @obstacles << { x: 1280, y: 450, w: 150, h: 650, r: 0, g: 128, b: 0 }
-    @obstacles << { x: 1280, y: 0, w: 150, h: 250, r: 0, g: 128, b: 0 }
+    @obstacles << { x: 1280, y: 450, w: 150, h: 650, path: "sprites/toppipe.png" }
+
+    @obstacles << { x: 1280, y: 0, w: 150, h: 250, path: "sprites/botpipe.png"}
   end
 
   def moving_obstacles
