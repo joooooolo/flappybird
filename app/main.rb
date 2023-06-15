@@ -1,12 +1,13 @@
 class FlappyBird
+
   TIMER = 10
   FPS = 60
-  SPEED = 2
+  SPEED = 3
   PLAYER_SIZE = 40
+
   def initialize(args)
     @args = args
     @timer = TIMER * FPS
-
     @obstacles = []
     spawn_obstacles
 
@@ -15,11 +16,11 @@ class FlappyBird
       y: 300,
       w: PLAYER_SIZE,
       h: PLAYER_SIZE,
-      path: "sprites/hexagon/orange.png",
+      path: "sprites/circle/orange.png",
 
       velocity: 0
     }
-
+    @score = 0
   end
 
   def tick
@@ -49,16 +50,22 @@ class FlappyBird
     end
 
     @obstacles.each do |obstacle|
-    if @player.intersect_rect?(obstacle)
-      $gtk.reset
+      if @player.intersect_rect?(obstacle)
+        $gtk.reset
+      end
+
+      if @player[:x] > obstacle[:x] && @player[:x] < obstacle[:x] + SPEED
+        @score += 0.5
+      end
+
     end
-    end
-end
+
+  end
 
   def render
     @args.outputs.solids << { x: 0, y: 0, w: @args.grid.w, h: @args.grid.h, r: 135, g: 206, b: 235 }
     @args.outputs.sprites << [@player, @obstacles]
-    @args.outputs.labels << { x: 50, y: 50, text: @player[:velocity].to_i }
+    @args.outputs.labels << { x: 10, y: 10.from_top, text: "Score: #{@score.to_i}", size_enum: 10 }
   end
 
   def handle_timer
@@ -67,9 +74,28 @@ end
   end
 
   def spawn_obstacles
-    @obstacles << { x: 1280, y: 450, w: 150, h: 650, path: "sprites/toppipe.png" }
+    @random_number = rand(200) - 150
+    @obstacles << {
 
-    @obstacles << { x: 1280, y: 0, w: 150, h: 250, path: "sprites/botpipe.png"}
+      x: 1280,
+      y:  450 + @random_number,
+      w:  100,
+      h:  720,
+      path: "sprites/toppipe.png"
+
+    }
+
+    @obstacles << {
+
+      x: 1280,
+      y:    0 + @random_number - 420,
+      w:  100,
+      h:  720,
+      path: "sprites/botpipe.png"
+
+    }
+
+
   end
 
   def moving_obstacles
