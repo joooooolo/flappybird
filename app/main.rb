@@ -6,7 +6,7 @@ class FlappyBird
   PLAYER_SIZE = 50
 
   def initialize(args)
-
+@newx = 0
     @args = args
     @scene = :main_menu
     @timer = TIMER * FPS
@@ -17,11 +17,15 @@ class FlappyBird
       y: 300,
       w: PLAYER_SIZE,
       h: PLAYER_SIZE,
-      path: "sprites/circle/orange.png",
-
+      path: "sprites/poke.png",
+      source_x: 0,
+      source_y: 80,
+      source_w: 80,
+      source_h: 80,
       velocity: 0
     }
-
+    @backgroundsprites = []
+    spawn_background
     @score = 0
   end
 
@@ -35,9 +39,9 @@ class FlappyBird
     handle_timer
     moving_obstacles
     fall
-    jump_player
     handle_collisions
     handle_input
+    moving_background
   end
 
   def fall
@@ -156,26 +160,27 @@ class FlappyBird
     if @args.inputs.keyboard.key_down.escape
       @scene = :pause
     end
+    if jump_button_pressed?
+      @args.audio[:flap] = {input: "sounds/flap.mp3"}
+      @player[:velocity] = 6
+    end
   end
 
   def jump_button_pressed?
     @args.inputs.keyboard.key_down.space
   end
 
-  def jump_player
-    if jump_button_pressed?
-      @player[:velocity] = 6
-    end
-  end
-
   def handle_collisions
 
     if @player[:y] < @args.grid.y
       @scene = :game_over
+      @args.audio[:die] = {input: "sounds/die.mp3"}
     end
 
     @obstacles.each do |obstacle|
       if @player.intersect_rect?(obstacle)
+
+        @args.audio[:die] = {input: "sounds/die.mp3"}
         @scene = :game_over
       end
       #(obstacle[:x]...obstacle[:x] + SPEED).include?(@player[:x])
@@ -183,20 +188,22 @@ class FlappyBird
 
         # "0.5*2 obstacles -> 1 point"
         @score += 0.5
+        @args.audio[:point] = {input: "sounds/point.mp3"}
       end
     end
   end
 
   def render
-    # @player.path = "sprites/misc/dragon-#{0.frame_index(count: 6, hold_for: 8, repeat: true)}.png"
-    @args.outputs.solids << { x: 0, y: 0, w: @args.grid.w, h: @args.grid.h, r: 135, g: 206, b: 235 }
-    @args.outputs.sprites << [@player, @obstacles]
+    @player[:source_x] = 0.frame_index(count: 4, hold_for: 8, repeat: true) * 80
+    @args.outputs.sprites << [@backgroundsprites,@player, @obstacles]
     @args.outputs.labels << { x: 10, y: 10.from_top, text: "Score: #{@score.to_i}", size_enum: 10 }
   end
 
   def handle_timer
     @timer += 1
+    puts @timer
     spawn_obstacles if @timer % 200 == 0
+    spawn_background if @timer % 1444 == 1
   end
 
   def spawn_obstacles
@@ -211,27 +218,49 @@ class FlappyBird
 
     }
 
+
     @obstacles << {
 
       x: 1280,
       y:    0 + @random_number - 420,
       w:  100,
       h:  720,
-      path: "sprites/botpipe.png"
+      path: "sprites/toppipe.png",
+
+      flip_vertically: true
 
     }
 
+  end
+  def spawn_background
 
+    @backgroundsprites << {
+      x:0,
+      y:0,
+      w:@args.grid.w,
+      h:@args.grid.h,
+      path: "sprites/sea.png"
+    }
+
+    @backgroundsprites << {
+
+    x:1280,
+    y:0,
+    w:@args.grid.w,
+    h:@args.grid.h,
+    path: "sprites/sea.png"
+     }
+end
+
+  def moving_background
+
+    @backgroundsprites.each { |o| o[:x] -= 1.5 }
+    @backgroundsprites.reject!{ |o| o[:x] < -1280 }
   end
 
   def moving_obstacles
-    @obstacles.each do |obstacle|
-      obstacle[:x] -= SPEED
-      if obstacle[:x] > @args.grid.w
-        obstacle[:dead] = true
-      end
-      @obstacles.reject!(&:dead)
-    end
+    @obstacles.each { |o| o[:x] -= SPEED }
+    @obstacles.reject!{ |o| o[:x] < -100 }
   end
 end
 
