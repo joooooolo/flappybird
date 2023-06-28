@@ -4,9 +4,8 @@ class FlappyBird
   FPS = 60
   SPEED = 3
   PLAYER_SIZE = 50
-
+  BACKGROUND_SPEED = 1.5
   def initialize(args)
-@newx = 0
     @args = args
     @scene = :main_menu
     @timer = TIMER * FPS
@@ -162,7 +161,7 @@ class FlappyBird
     end
     if jump_button_pressed?
       @args.audio[:flap] = {input: "sounds/flap.mp3"}
-      @player[:velocity] = 6
+      @player[:velocity] = 5.5
     end
   end
 
@@ -201,9 +200,7 @@ class FlappyBird
 
   def handle_timer
     @timer += 1
-    puts @timer
     spawn_obstacles if @timer % 200 == 0
-    spawn_background if @timer % 1444 == 1
   end
 
   def spawn_obstacles
@@ -239,23 +236,29 @@ class FlappyBird
       y:0,
       w:@args.grid.w,
       h:@args.grid.h,
-      path: "sprites/sea.png"
+      path: "sprites/under.png"
     }
 
     @backgroundsprites << {
 
     x:1280,
     y:0,
-    w:@args.grid.w,
+    w:@args.grid.w + BACKGROUND_SPEED,
     h:@args.grid.h,
-    path: "sprites/sea.png"
+    path: "sprites/under.png"
      }
+
 end
 
   def moving_background
 
-    @backgroundsprites.each { |o| o[:x] -= 1.5 }
+    @backgroundsprites.each do |o|#{ |o| o[:x] -= BACKGROUND_SPEED }
+      o[:x] -= BACKGROUND_SPEED
+    if o[:x] <= -@args.grid.w
+    o[:x] = @args.grid.w * (@backgroundsprites.length - 1)
+    end
     @backgroundsprites.reject!{ |o| o[:x] < -1280 }
+  end
   end
 
   def moving_obstacles
